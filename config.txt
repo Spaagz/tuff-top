@@ -1,0 +1,17 @@
+                      _______     __  __   _______
+                     |__   __|   / _|/ _| |__   __|
+                        | |_   _| |_| |_     | | ___  _ __
+                        | | | | |  _|  _|    | |/ _ \| '_ \
+                        | | |_| | | | |      | | (_) | |_) |
+                        |_|\__,_|_| |_|      |_|\___/| .__/
+                                                     | |
+                                                     |_|
+Put phonk music in the phonk folder
+Put tuff images in the icons folder
+                              ~ Config ~
+    % Chance of interruption  (every click)
+10
+    Seconds the phonk plays for
+3
+    Scale of the icon
+300
