@@ -9,13 +9,19 @@ import subprocess
 from os import listdir
 from os.path import isfile, join
 from evdev import InputDevice, categorize, ecodes
+from PIL import Image, ImageGrab, ImageOps
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
 
+# Delete previous screenshot if it exists. This only happens when the program is shutdown incorrectly
+if os.path.isfile("temp/screenshot.png"):
+    os.remove("temp/screenshot.png")
 
+# Read config before startup with error handling because I'm so cool
+if not os.path.isfile("config.txt"):
+    sys.exit("No config found, aborting. Check it exists or redownload")
 
-# Read config before startup
 config = open("config.txt","r")
 lines = config.readlines()
 # Apply config to vars
@@ -36,6 +42,7 @@ phonkdir = os.listdir("phonk")
 
 for file in phonkdir:
     phonk.append(file)
+
 
 def tuffchance():
     if random.randint(0,100) <= chance:
@@ -60,6 +67,33 @@ def out_elastic(time_step: float) -> float:
 app = QApplication(sys.argv)
 
 def twastuff():
+    class GreyScreenGrab(QWidget):
+        # This is mostly copied from Tuffimage
+        def __init__(self):
+            super().__init__()
+            # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
+            self.gscale = ImageGrab.grab()
+            self.setWindowFlags(
+                Qt.WindowType.FramelessWindowHint
+                | Qt.WindowType.WindowStaysOnTopHint
+                | Qt.WindowType.Tool
+            )
+            screen = QApplication.primaryScreen().geometry()
+            self.setGeometry(screen)
+            self.label = QLabel(self)
+            self.setWindowTitle("Greyscale")
+            # If we use the same filename it gets replaced upon screenshot
+            self.gscale = ImageOps.grayscale(ImageGrab.grab())
+            self.gscale.save("temp/screenshot.png")
+            #self.setWindowIcon(QIcon(choice))
+            self.pixmap = QPixmap("temp/screenshot.png")
+            #self.setWindowIcon(QIcon("greyicon.svg"))
+            self.label.setPixmap(self.pixmap)
+            self.label.resize(self.width(), self.height())
+            self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            #self.label.setPixmap(self.pixmap.scaled(scale, scale))
+            #self.label.move(self.posx, self.posy)
+
     class Tuffimage(QWidget):
         # This animates the window
         def inanim(self):
@@ -69,7 +103,7 @@ def twastuff():
                 self.animscale = 0
             else:
                 self.animscale += 1
-            self.label.setPixmap(self.pixmap.scaled(200 + round(out_elastic(self.animscale /20) * 100), 200 + round(out_elastic(self.animscale /20) * 100)))
+            self.label.setPixmap(self.pixmap.scaled(50 + round(out_elastic(self.animscale /20) * 50), 50 + round(out_elastic(self.animscale /20) * 50)))
             # The position is hardcoded, this is not a to do but if you are bored then make it customizable
             self.posx = -200 + round(out_elastic(self.animstep / 10) * 200)
             self.posy = 100 + round(out_elastic(self.animstep / 10) * 200)
@@ -78,11 +112,13 @@ def twastuff():
             self.raise_()
             self.setFocus()
             if self.animstep > staytime*20:
+                # remove screenshot if it exists
+                if os.path.isfile("temp/screenshot.png"):
+                    os.remove("temp/screenshot.png")
                 self.sound_process.terminate()
                 self.timer.stop()
                 self.hide()
                 app.quit()
-        # We play super tuff phonk before the window is created
         # This is for creating the window
         def __init__(self):
             super().__init__()
@@ -126,6 +162,8 @@ def twastuff():
             self.timer.timeout.connect(self.inanim)
             self.timer.start(30)
 
+    gscale = GreyScreenGrab()
+    gscale.show()
     tuffimg = Tuffimage()
     tuffimg.show()
     app.exec()
