@@ -20,13 +20,14 @@ if os.path.isfile("temp/screenshot.png"):
 
 # Read config before startup with error handling because I'm so cool
 if not os.path.isfile("config.txt"):
-    sys.exit("No config found, aborting. Check it exists or redownload")
+    sys.exit("No config found, aborting. Check it exists")
 
 config = open("config.txt","r")
 lines = config.readlines()
 # Apply config to vars
 chance = int(lines[12])
 staytime = int(lines[14])
+global scale
 scale = int(lines[16])
 global icons
 global phonk
@@ -71,8 +72,6 @@ def twastuff():
         # This is mostly copied from Tuffimage
         def __init__(self):
             super().__init__()
-            # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
-            self.gscale = ImageGrab.grab()
             self.setWindowFlags(
                 Qt.WindowType.FramelessWindowHint
                 | Qt.WindowType.WindowStaysOnTopHint
@@ -82,6 +81,7 @@ def twastuff():
             self.setGeometry(screen)
             self.label = QLabel(self)
             self.setWindowTitle("Greyscale")
+            # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
             # If we use the same filename it gets replaced upon screenshot
             self.gscale = ImageOps.grayscale(ImageGrab.grab())
             self.gscale.save("temp/screenshot.png")
@@ -93,17 +93,17 @@ def twastuff():
             self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
             #self.label.setPixmap(self.pixmap.scaled(scale, scale))
             #self.label.move(self.posx, self.posy)
-
     class Tuffimage(QWidget):
         # This animates the window
         def inanim(self):
             self.animstep += 1
-            # We use modulus with random here to make it bounce randomly, it's not audio reactive but if you mute your speakers it kinda looks like it
-            if self.animstep % random.randint(9,14) == 0:
+            # We use modulus it to make it bounce to the beat, it's not audio reactive but if you mute your speakers it kinda looks like it
+            if self.animstep % 12 == 0:
                 self.animscale = 0
             else:
                 self.animscale += 1
-            self.label.setPixmap(self.pixmap.scaled(50 + round(out_elastic(self.animscale /20) * 50), 50 + round(out_elastic(self.animscale /20) * 50)))
+            global scale
+            self.label.setPixmap(self.pixmap.scaled(scale + round(out_elastic(self.animscale /40) * 20), scale + round(out_elastic(self.animscale /40) * 20)))
             # The position is hardcoded, this is not a to do but if you are bored then make it customizable
             self.posx = -200 + round(out_elastic(self.animstep / 10) * 200)
             self.posy = 100 + round(out_elastic(self.animstep / 10) * 200)
@@ -171,6 +171,6 @@ def twastuff():
 for event in mouse.read_loop():
     if event.type == ecodes.EV_KEY:
         data = categorize(event)
-        if data.keystate == 1:
+        if data.keystate == 0:
             tuffchance()
 
