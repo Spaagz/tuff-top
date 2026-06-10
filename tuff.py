@@ -24,6 +24,7 @@ if not os.path.isfile("config.txt"):
 
 config = open("config.txt","r")
 lines = config.readlines()
+
 # Apply config to vars
 chance = int(lines[12])
 staytime = int(lines[14])
@@ -40,14 +41,8 @@ for file in icondir:
 
 phonkdir = os.listdir("phonk")
 
-
 for file in phonkdir:
     phonk.append(file)
-
-
-def tuffchance():
-    if random.randint(0,100) <= chance:
-        twastuff()
 
 # This should find the mouse. If you have multiple mice... Well...
 devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
@@ -58,6 +53,8 @@ for device in devices:
 
 mouse = InputDevice(mousepath)
 
+# MATH
+
 TAU = math.tau
 
 def out_elastic(time_step: float) -> float:
@@ -65,112 +62,115 @@ def out_elastic(time_step: float) -> float:
     return time_step if time_step == 0.0 or time_step == 1.0 \
         else math.pow(2, -10 * time_step) * math.sin((time_step * 10 - 0.75) * ANGLE) + 1
 
+# WINDOW DEFINITIONS
+
 app = QApplication(sys.argv)
 
-def twastuff():
-    class GreyScreenGrab(QWidget):
-        # This is mostly copied from Tuffimage
-        def __init__(self):
-            super().__init__()
-            self.setWindowFlags(
-                Qt.WindowType.FramelessWindowHint
-                | Qt.WindowType.WindowStaysOnTopHint
-                | Qt.WindowType.Tool
-            )
-            screen = QApplication.primaryScreen().geometry()
-            self.setGeometry(screen)
-            self.label = QLabel(self)
-            self.setWindowTitle("Greyscale")
-            # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
-            # If we use the same filename it gets replaced upon screenshot
-            self.gscale = ImageOps.grayscale(ImageGrab.grab())
-            self.gscale.save("temp/screenshot.png")
-            #self.setWindowIcon(QIcon(choice))
-            self.pixmap = QPixmap("temp/screenshot.png")
-            #self.setWindowIcon(QIcon("greyicon.svg"))
-            self.label.setPixmap(self.pixmap)
-            self.label.resize(self.width(), self.height())
-            self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            #self.label.setPixmap(self.pixmap.scaled(scale, scale))
-            #self.label.move(self.posx, self.posy)
-    class Tuffimage(QWidget):
-        # This animates the window
-        def inanim(self):
-            self.animstep += 1
-            # We use modulus it to make it bounce to the beat, it's not audio reactive but if you mute your speakers it kinda looks like it
-            if self.animstep % 12 == 0:
-                self.animscale = 0
-            else:
-                self.animscale += 1
-            global scale
-            self.label.setPixmap(self.pixmap.scaled(scale + round(out_elastic(self.animscale /40) * 20), scale + round(out_elastic(self.animscale /40) * 20)))
-            # The position is hardcoded, this is not a to do but if you are bored then make it customizable
-            self.posx = -200 + round(out_elastic(self.animstep / 10) * 200)
-            self.posy = 100 + round(out_elastic(self.animstep / 10) * 200)
-            self.label.move(self.posx, self.posy)
-            self.activateWindow()
-            self.raise_()
-            self.setFocus()
-            if self.animstep > staytime*20:
-                # remove screenshot if it exists
-                if os.path.isfile("temp/screenshot.png"):
-                    os.remove("temp/screenshot.png")
-                self.sound_process.terminate()
-                self.timer.stop()
-                self.hide()
-                app.quit()
-        # This is for creating the window
-        def __init__(self):
-            super().__init__()
-            # YES TRANSPARENCY!!!
-            self.setWindowFlags(
-                Qt.WindowType.FramelessWindowHint
-                | Qt.WindowType.WindowStaysOnTopHint
-                | Qt.WindowType.Tool
-            )
-            self.setWindowTitle("Tuff")
-            self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
-            self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
-            # we play a random sound from the phonk directory
-            global phonk
-            name = random.choice(phonk)
-            path = "phonk/"
-            choices = (path, name)
-            choice = "".join(choices)
-            self.sound_process = subprocess.Popen(["mpg123", choice])
-            screen = QApplication.primaryScreen().geometry()
-            self.setGeometry(screen)
-            self.label = QLabel(self)
-            global icons
-            name = random.choice(icons)
-            path = "icons/"
-            choices = (path, name)
-            choice = "".join(choices)
-            self.pixmap = QPixmap(choice)
-            self.setWindowIcon(QIcon(choice))
-            self.label.setPixmap(self.pixmap)
-            self.label.resize(self.width(), self.height())
-            self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            self.posx = 100
-            self.posy = 100
+class GreyScreenGrab(QWidget):
+    # This is mostly copied from Tuffimage
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(
+            Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Tool
+        )
+        screen = QApplication.primaryScreen().geometry()
+        self.setGeometry(screen)
+        self.label = QLabel(self)
+        self.setWindowTitle("Greyscale")
+        # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
+        # If we use the same filename it gets replaced upon screenshot
+        self.gscale = ImageOps.grayscale(ImageGrab.grab())
+        self.gscale.save("temp/screenshot.png")
+        #self.setWindowIcon(QIcon(choice))
+        self.pixmap = QPixmap("temp/screenshot.png")
+        self.setWindowIcon(QIcon("greyicon.svg"))
+        self.label.setPixmap(self.pixmap)
+        self.label.resize(self.width(), self.height())
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+class Tuffimage(QWidget):
+    # This animates the window
+    def inanim(self):
+        self.animstep += 1
+        # We use modulus it to make it bounce to the beat, it's not audio reactive but if you mute your speakers it kinda looks like it
+        if self.animstep % 12 == 0:
             self.animscale = 0
-            self.animstep = 0
-            global scale
-            self.label.setPixmap(self.pixmap.scaled(scale, scale))
-            self.label.move(self.posx, self.posy)
-            self.timer = QTimer(self)
-            self.timer.timeout.connect(self.inanim)
-            self.timer.start(30)
+        else:
+            self.animscale += 1
+        global scale
+        self.label.setPixmap(self.pixmap.scaled(scale + round(out_elastic(self.animscale /40) * 20), scale + round(out_elastic(self.animscale /40) * 20)))
+        # The position is hardcoded, this is not a to do but if you are bored then make it customizable
+        self.posx = -200 + round(out_elastic(self.animstep / 10) * 200)
+        self.posy = 100 + round(out_elastic(self.animstep / 10) * 200)
+        self.label.move(self.posx, self.posy)
+        self.activateWindow()
+        self.raise_()
+        self.setFocus()
+        if self.animstep > staytime*20:
+            # remove screenshot if it exists
+            if os.path.isfile("temp/screenshot.png"):
+                os.remove("temp/screenshot.png")
+            self.sound_process.terminate()
+            self.timer.stop()
+            self.hide()
+            app.quit()
+    # This is for creating the window
+    def __init__(self):
+        super().__init__()
+        # YES TRANSPARENCY!!!
+        self.setWindowFlags(
+            Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Tool
+        )
+        self.setWindowTitle("Tuff")
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
+        # we play a random sound from the phonk directory
+        global phonk
+        name = random.choice(phonk)
+        path = "phonk/"
+        choices = (path, name)
+        choice = "".join(choices)
+        self.sound_process = subprocess.Popen(["mpg123", choice])
+        screen = QApplication.primaryScreen().geometry()
+        self.setGeometry(screen)
+        self.label = QLabel(self)
+        global icons
+        name = random.choice(icons)
+        path = "icons/"
+        choices = (path, name)
+        choice = "".join(choices)
+        self.pixmap = QPixmap(choice)
+        self.setWindowIcon(QIcon(choice))
+        self.label.setPixmap(self.pixmap)
+        self.label.resize(self.width(), self.height())
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.posx = 100
+        self.posy = 100
+        self.animscale = 0
+        self.animstep = 0
+        global scale
+        self.label.setPixmap(self.pixmap.scaled(scale, scale))
+        self.label.move(self.posx, self.posy)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.inanim)
+        self.timer.start(30)
 
-    gscale = GreyScreenGrab()
-    gscale.show()
-    tuffimg = Tuffimage()
-    tuffimg.show()
-    app.exec()
+# EVENT HANDLING
+
+def twastuff():
+    if random.randint(0,100) <= chance:
+        gscale = GreyScreenGrab()
+        gscale.show()
+        tuffimg = Tuffimage()
+        tuffimg.show()
+        app.exec()
 
 for event in mouse.read_loop():
     if event.type == ecodes.EV_KEY:
         data = categorize(event)
         if data.keystate == 0:
-            tuffchance()
+            twastuff()
 
