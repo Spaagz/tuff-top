@@ -4,8 +4,8 @@ import evdev
 import random
 import sys
 import os
-import threading
 import subprocess
+import asyncio
 from os import listdir
 from os.path import isfile, join
 from evdev import InputDevice, categorize, ecodes
@@ -23,9 +23,11 @@ if not os.path.isfile("config.txt"):
     sys.exit("No config found, aborting. Check it exists")
 
 config = open("config.txt","r")
+global lines
 lines = config.readlines()
 
 # Apply config to vars
+global chance
 chance = int(lines[12])
 staytime = int(lines[14])
 global scale
@@ -44,15 +46,6 @@ phonkdir = os.listdir("phonk")
 for file in phonkdir:
     phonk.append(file)
 
-# This should find the mouse. If you have multiple mice... Well...
-devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
-for device in devices:
-    if 272 in device.capabilities().get(ecodes.EV_KEY, []):
-        mousepath = device.path
-        print(f"Found mouse: {device.name} at", mousepath)
-
-mouse = InputDevice(mousepath)
-
 # MATH
 
 TAU = math.tau
@@ -63,8 +56,16 @@ def out_elastic(time_step: float) -> float:
         else math.pow(2, -10 * time_step) * math.sin((time_step * 10 - 0.75) * ANGLE) + 1
 
 # WINDOW DEFINITIONS
-
 app = QApplication(sys.argv)
+
+def onend(self):
+    # remove screenshot if it exists
+    if os.path.isfile("temp/screenshot.png"):
+        os.remove("temp/screenshot.png")
+    self.sound_process.terminate()
+    self.timer.stop()
+    self.hide()
+    app.quit()
 
 class GreyScreenGrab(QWidget):
     # This is mostly copied from Tuffimage
@@ -83,12 +84,12 @@ class GreyScreenGrab(QWidget):
         # If we use the same filename it gets replaced upon screenshot
         self.gscale = ImageOps.grayscale(ImageGrab.grab())
         self.gscale.save("temp/screenshot.png")
-        #self.setWindowIcon(QIcon(choice))
         self.pixmap = QPixmap("temp/screenshot.png")
         self.setWindowIcon(QIcon("greyicon.svg"))
         self.label.setPixmap(self.pixmap)
         self.label.resize(self.width(), self.height())
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
 class Tuffimage(QWidget):
     # This animates the window
     def inanim(self):
@@ -108,13 +109,7 @@ class Tuffimage(QWidget):
         self.raise_()
         self.setFocus()
         if self.animstep > staytime*20:
-            # remove screenshot if it exists
-            if os.path.isfile("temp/screenshot.png"):
-                os.remove("temp/screenshot.png")
-            self.sound_process.terminate()
-            self.timer.stop()
-            self.hide()
-            app.quit()
+            onend(self)
     # This is for creating the window
     def __init__(self):
         super().__init__()
@@ -160,17 +155,27 @@ class Tuffimage(QWidget):
 
 # EVENT HANDLING
 
-def twastuff():
-    if random.randint(0,100) <= chance:
-        gscale = GreyScreenGrab()
-        gscale.show()
-        tuffimg = Tuffimage()
-        tuffimg.show()
-        app.exec()
+# This should find the mouse. If you have multiple mice... Well...
+devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+for device in devices:
+    if 272 in device.capabilities().get(ecodes.EV_KEY, []):
+        mousepath = device.path
+        print(f"Found mouse: {device.name} at", mousepath)
 
-for event in mouse.read_loop():
-    if event.type == ecodes.EV_KEY:
-        data = categorize(event)
-        if data.keystate == 0:
-            twastuff()
+mouse = InputDevice(mousepath)
+
+async def input(dev):
+    async for event in dev.async_read_loop():
+        if event.type == ecodes.EV_KEY:
+            data = categorize(event)
+            if data.keystate == 0:
+                if random.randint(0,100) <= chance:
+                    gscale = GreyScreenGrab()
+                    gscale.show()
+                    tuffimg = Tuffimage()
+                    tuffimg.show()
+                    app.exec()
+
+
+asyncio.run(input(mouse))
 
