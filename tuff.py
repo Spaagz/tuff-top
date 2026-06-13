@@ -28,10 +28,11 @@ lines = config.readlines()
 
 # Apply config to vars
 global chance
-chance = int(lines[12])
+chance = int(lines[12])*10
 staytime = int(lines[14])
 global scale
 scale = int(lines[16])
+bars = int(lines[18])
 global icons
 global phonk
 icons = []
@@ -66,6 +67,30 @@ def onend(self):
     self.timer.stop()
     self.hide()
     app.quit()
+
+class Blackbar(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowFlags(
+            Qt.WindowType.FramelessWindowHint
+            | Qt.WindowType.WindowStaysOnTopHint
+            | Qt.WindowType.Tool
+        )
+        self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
+        self.setAttribute(Qt.WidgetAttribute.WA_NoSystemBackground)
+
+        screen = QApplication.primaryScreen().size()
+        # get a third of the screen so we can get the phone(tm) aspect ratio
+        dividedwidth = int(round(screen.width()/3))
+        self.setGeometry(0, 0, screen.width(), screen.height())
+        self.leftbar = QLabel(self)
+        self.rightbar = QLabel(self)
+        self.leftbar.resize(dividedwidth,screen.height())
+        self.rightbar.resize(dividedwidth,screen.height())
+        self.rightbar.move(dividedwidth*2,0)
+        self.leftbar.setStyleSheet("background-color: black")
+        self.rightbar.setStyleSheet("background-color: black")
+        self.setWindowTitle("Black bar")
 
 class GreyScreenGrab(QWidget):
     # This is mostly copied from Tuffimage
@@ -169,13 +194,15 @@ async def input(dev):
         if event.type == ecodes.EV_KEY:
             data = categorize(event)
             if data.keystate == 0:
-                if random.randint(0,100) <= chance:
+                if random.randint(0,1000) <= chance:
                     gscale = GreyScreenGrab()
                     gscale.show()
                     tuffimg = Tuffimage()
                     tuffimg.show()
+                    if bars == 1:
+                        blackbar = Blackbar()
+                        blackbar.show()
                     app.exec()
 
 
 asyncio.run(input(mouse))
-
