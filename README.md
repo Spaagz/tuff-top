@@ -22,3 +22,10 @@ The goal is to be able to use it in any game or app without having to make expli
 - Robust config with chance of tuffness and stay time
 - Click detection as a trigger
 - Optional greyscaling of the screen for maximum tuffness
+
+**Requires:**
+- PyQt6
+- Evdev
+- Pillow
+
+Only tested on kde plasma
