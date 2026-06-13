@@ -28,7 +28,8 @@ lines = config.readlines()
 
 # Apply config to vars
 global chance
-chance = int(lines[12])*10
+# I absolutely love that this line here just works
+chance = int(float(lines[12])*10)
 staytime = int(lines[14])
 global scale
 scale = int(lines[16])
