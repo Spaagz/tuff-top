@@ -1,3 +1,4 @@
+
                       _______     __  __   _______
                      |__   __|   / _|/ _| |__   __|
                         | |_   _| |_| |_     | | ___  _ __
@@ -8,6 +9,8 @@
                                                      |_|
 
 # Make your desktop TUFF
+
+![Montage of fall guys getting interrupted by crappy phonk edits](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnR3ejhyeXZneWgwdm1iMDc0cHQweDg2MXUzd29oZTAxczUyNjh2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Beb7RLB8RDYnPLBgGb/giphy.gif)
 
 This is a project with the intention to mimic those crappy phonk edits with over the top icons and greyscaling of the screen built for Linux wayland.
 The goal is to be able to use it in any game or app without having to make explicit support for it.
