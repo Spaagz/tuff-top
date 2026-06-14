@@ -13,10 +13,11 @@ from PIL import Image, ImageGrab, ImageOps
 from PyQt6.QtWidgets import *
 from PyQt6.QtCore import *
 from PyQt6.QtGui import *
+from PyQt6 import *
 
 # Delete previous screenshot if it exists. This only happens when the program is shutdown incorrectly
-if os.path.isfile("temp/screenshot.png"):
-    os.remove("temp/screenshot.png")
+if os.path.isfile("tempscreenshots/screenshot.png"):
+    os.remove("tempscreenshots/screenshot.png")
 
 # Read config before startup with error handling because I'm so cool
 if not os.path.isfile("config.txt"):
@@ -26,6 +27,10 @@ config = open("config.txt","r")
 global lines
 lines = config.readlines()
 
+phrasestext = open("phrases.txt","r")
+global phrases
+phrases = phrasestext.readlines()
+
 # Apply config to vars
 global chance
 # I absolutely love that this line here just works
@@ -34,10 +39,12 @@ staytime = int(lines[14])
 global scale
 scale = int(lines[16])
 bars = int(lines[18])
+showtext = int(lines[20])
 global icons
 global phonk
 icons = []
 phonk = []
+fonts = []
 icondir = os.listdir("icons")
 
 for file in icondir:
@@ -47,6 +54,11 @@ phonkdir = os.listdir("phonk")
 
 for file in phonkdir:
     phonk.append(file)
+
+fontdir = os.listdir("fonts")
+
+for file in fontdir:
+    fonts.append(file)
 
 # MATH
 
@@ -62,8 +74,8 @@ app = QApplication(sys.argv)
 
 def onend(self):
     # remove screenshot if it exists
-    if os.path.isfile("temp/screenshot.png"):
-        os.remove("temp/screenshot.png")
+    if os.path.isfile("tempscreenshots/screenshot.png"):
+        os.remove("tempscreenshots/screenshot.png")
     self.sound_process.terminate()
     self.timer.stop()
     self.hide()
@@ -96,7 +108,33 @@ class Blackbar(QWidget):
         self.rightbar.move(dividedwidth*2,0)
         self.leftbar.setStyleSheet("background-color: black")
         self.rightbar.setStyleSheet("background-color: black")
-        self.setWindowTitle("Black bar")
+        self.setWindowTitle("Black bars")
+        self.setWindowIcon(QIcon("blackbars.svg"))
+        if showtext == 1:
+            name = random.choice(fonts)
+            path = "fonts/"
+            choices = (path, name)
+            choice = "".join(choices)
+
+            id = QFontDatabase.addApplicationFont(choice)
+            if id < 0:
+                print("No font file found. Check capitalisation and that it exists as a child of the script")
+            else:
+                families = QFontDatabase.applicationFontFamilies(id)
+
+                self.text = QLabel(random.choice(phrases), self)
+                self.text.setFont(QFont(families[0], 44))
+                #self.text.setFont(QFont('Times', 44))
+                #self.text.setAlignment(QtCore.Qt.AlignCenter)
+                self.text.resize(int(round(screen.width()/3)), screen.height())
+                self.text.setWordWrap(True)
+                self.text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                self.text.move(int(round(screen.width()/3)), int(round(screen.height()/-3)))
+                # apply shadow to text
+                shadow = QGraphicsDropShadowEffect()
+                shadow.setBlurRadius(50)
+                shadow.setColor(QtGui.QColor('#222222'))
+                self.text.setGraphicsEffect(shadow)
 
 class GreyScreenGrab(QWidget):
     # This is mostly copied from Tuffimage
@@ -114,8 +152,8 @@ class GreyScreenGrab(QWidget):
         # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
         # If we use the same filename it gets replaced upon screenshot
         self.gscale = ImageOps.grayscale(ImageGrab.grab())
-        self.gscale.save("temp/screenshot.png")
-        self.pixmap = QPixmap("temp/screenshot.png")
+        self.gscale.save("tempscreenshots/screenshot.png")
+        self.pixmap = QPixmap("tempscreenshots/screenshot.png")
         self.setWindowIcon(QIcon("greyicon.svg"))
         self.label.setPixmap(self.pixmap)
         self.label.resize(self.width(), self.height())
@@ -136,9 +174,6 @@ class Tuffimage(QWidget):
         self.posx = -200 + round(out_elastic(self.animstep / 10)*200)
         self.posy = 100 + round(out_elastic(self.animstep / 10)*200)
         self.label.move(self.posx, self.posy)
-        self.activateWindow()
-        self.raise_()
-        self.setFocus()
         if self.animstep > staytime*20:
             onend(self)
     # This is for creating the window

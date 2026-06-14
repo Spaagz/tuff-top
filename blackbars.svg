@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg1"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1">
+    <linearGradient
+       id="linearGradient5">
+      <stop
+         style="stop-color:#303030;stop-opacity:0.96078432;"
+         offset="0"
+         id="stop6" />
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="1"
+         id="stop5" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient3">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop3" />
+      <stop
+         style="stop-color:#303030;stop-opacity:0.9626953;"
+         offset="1"
+         id="stop4" />
+    </linearGradient>
+    <linearGradient
+       xlink:href="#linearGradient3"
+       id="linearGradient4"
+       x1="43.793892"
+       y1="32.27063"
+       x2="68.371773"
+       y2="36.60437"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       xlink:href="#linearGradient5"
+       id="linearGradient6"
+       x1="-5.4426074"
+       y1="27.147446"
+       x2="20.532463"
+       y2="31.727552"
+       gradientUnits="userSpaceOnUse" />
+  </defs>
+  <g
+     id="layer1">
+    <path
+       id="rect1-3"
+       style="fill:url(#linearGradient4);fill-opacity:1;stroke-width:14.883;stroke-linecap:round;paint-order:markers stroke fill"
+       d="M 49.535247,0 A 12.922215,12.922215 48.223709 0 1 62.375734,14.373268 L 56.767612,63.999999 A 12.922216,12.922216 48.223709 0 1 43.927125,49.62673 Z"
+       transform="matrix(1.3432146,0,0,1,-19.893775,9.9999999e-7)" />
+    <path
+       id="rect1-3-6"
+       style="fill:url(#linearGradient6);stroke-width:14.8829;stroke-linecap:round;paint-order:markers stroke fill"
+       d="M 14.464755,63.999999 20.072874,14.373268 A 12.922216,12.922216 48.223708 0 0 7.2323871,0 L 1.6242665,49.626729 a 12.922217,12.922217 48.223709 0 0 12.8404885,14.37327 z"
+       transform="matrix(1.3432147,0,0,1,-2.0719593,0)" />
+  </g>
+</svg>

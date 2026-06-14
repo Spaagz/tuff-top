@@ -4,8 +4,8 @@
                         | | | | |  _|  _|    | |/ _ \| '_ \
                         | | |_| | | | |      | | (_) | |_) |
                         |_|\__,_|_| |_|      |_|\___/| .__/
-                                                     | |
-                                                     |_|
+Add generic reactions to phrases.txt                 | |
+Put fonts in the fonts folder                        |_|
 Put phonk music in the phonk folder
 Put tuff images in the icons folder
                               ~ Config ~
@@ -16,4 +16,6 @@ Put tuff images in the icons folder
     Scale of the icon
 250
     Black bars (0=no, 1=yes)
+1
+    Text (0=no, 1=yes)
 1
