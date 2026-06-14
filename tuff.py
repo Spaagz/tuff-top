@@ -69,6 +69,11 @@ def onend(self):
     self.hide()
     app.quit()
 
+# This scales a pixmap without stretching it
+def aspectscale(newsize,self):
+    self.scalefactor = self.pixmap.width()/self.pixmap.height()
+    self.label.setPixmap(self.pixmap.scaled(int(round(newsize*self.scalefactor)), newsize))
+
 class Blackbar(QWidget):
     def __init__(self):
         super().__init__()
@@ -126,10 +131,10 @@ class Tuffimage(QWidget):
         else:
             self.animscale += 1
         global scale
-        self.label.setPixmap(self.pixmap.scaled(scale + round(out_elastic(self.animscale /40) * 20), scale + round(out_elastic(self.animscale /40) * 20)))
+        aspectscale(scale + round(out_elastic(self.animscale /40) * 20), self)
         # The position is hardcoded, this is not a to do but if you are bored then make it customizable
-        self.posx = -200 + round(out_elastic(self.animstep / 10) * 200)
-        self.posy = 100 + round(out_elastic(self.animstep / 10) * 200)
+        self.posx = -200 + round(out_elastic(self.animstep / 10)*200)
+        self.posy = 100 + round(out_elastic(self.animstep / 10)*200)
         self.label.move(self.posx, self.posy)
         self.activateWindow()
         self.raise_()
@@ -173,7 +178,7 @@ class Tuffimage(QWidget):
         self.animscale = 0
         self.animstep = 0
         global scale
-        self.label.setPixmap(self.pixmap.scaled(scale, scale))
+        aspectscale(scale,self)
         self.label.move(self.posx, self.posy)
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.inanim)
