@@ -20,6 +20,8 @@ In other words, it gives you the classic youtube shorts experience (from 3 years
 Built for Linux wayland.
 The goal is to be able to use it in any game or app without having to make explicit support for it.
 
+The project uses PyQt6 for displaying transparent overlay windows as tkinter doesn't support transparency, mpg123 for playing audio and evdev for input capturing on wayland. We also use Pillow for taking screenshots and grayscaling them.
+
 ## Based of off generational game modifications such as:
 > https://modrinth.com/mod/so-tuff
 > 
