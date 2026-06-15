@@ -1,4 +1,3 @@
-import time
 import math
 import evdev
 import random
@@ -6,28 +5,38 @@ import sys
 import os
 import subprocess
 import asyncio
-from os import listdir
-from os.path import isfile, join
 from evdev import InputDevice, categorize, ecodes
-from PIL import Image, ImageGrab, ImageOps
-from PyQt6.QtWidgets import *
-from PyQt6.QtCore import *
-from PyQt6.QtGui import *
-from PyQt6 import *
+from PIL import ImageGrab, ImageOps
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QGraphicsDropShadowEffect
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QIcon, QPixmap, QFont, QFontDatabase, QColor
 
-# Delete previous screenshot if it exists. This only happens when the program is shutdown incorrectly
-if os.path.isfile("tempscreenshots/screenshot.png"):
-    os.remove("tempscreenshots/screenshot.png")
+# get path relative to script
+def get_app_dir():
+    if getattr(sys, 'frozen', False):
+        return os.path.dirname(sys.executable)
+    return os.path.dirname(os.path.abspath(__file__))
 
-# Read config before startup with error handling because I'm so cool
-if not os.path.isfile("config.txt"):
+APP_DIR = get_app_dir()
+
+def app_path(*parts):
+    return os.path.join(APP_DIR, *parts)
+
+os.makedirs(app_path("tempscreenshots"), exist_ok=True)
+
+# Delete previous screenshot if it exists, thi only happens when the program shuts down incorrectly
+if os.path.isfile(app_path("tempscreenshots", "screenshot.png")):
+    os.remove(app_path("tempscreenshots", "screenshot.png"))
+
+# Read config before startup with error handling because im so cool
+if not os.path.isfile(app_path("config.txt")):
     sys.exit("No config found, aborting. Check it exists")
 
-config = open("config.txt","r")
+config = open(app_path("config.txt"), "r")
 global lines
 lines = config.readlines()
 
-phrasestext = open("phrases.txt","r")
+phrasestext = open(app_path("phrases.txt"),"r")
 global phrases
 phrases = phrasestext.readlines()
 
@@ -45,18 +54,16 @@ global phonk
 icons = []
 phonk = []
 fonts = []
-icondir = os.listdir("icons")
 
+icondir = os.listdir(app_path("icons"))
 for file in icondir:
     icons.append(file)
 
-phonkdir = os.listdir("phonk")
-
+phonkdir = os.listdir(app_path("phonk"))
 for file in phonkdir:
     phonk.append(file)
 
-fontdir = os.listdir("fonts")
-
+fontdir = os.listdir(app_path("fonts"))
 for file in fontdir:
     fonts.append(file)
 
@@ -74,8 +81,8 @@ app = QApplication(sys.argv)
 
 def onend(self):
     # remove screenshot if it exists
-    if os.path.isfile("tempscreenshots/screenshot.png"):
-        os.remove("tempscreenshots/screenshot.png")
+    if os.path.isfile(app_path("tempscreenshots", "screenshot.png")):
+        os.remove(app_path("tempscreenshots", "screenshot.png"))
     self.sound_process.terminate()
     self.timer.stop()
     self.hide()
@@ -112,9 +119,7 @@ class Blackbar(QWidget):
         self.setWindowIcon(QIcon("blackbars.svg"))
         if showtext == 1:
             name = random.choice(fonts)
-            path = "fonts/"
-            choices = (path, name)
-            choice = "".join(choices)
+            choice = app_path("fonts", name)
 
             id = QFontDatabase.addApplicationFont(choice)
             if id < 0:
@@ -133,7 +138,7 @@ class Blackbar(QWidget):
                 # apply shadow to text
                 shadow = QGraphicsDropShadowEffect()
                 shadow.setBlurRadius(50)
-                shadow.setColor(QtGui.QColor('#222222'))
+                shadow.setColor(QColor('#222222'))
                 self.text.setGraphicsEffect(shadow)
 
 class GreyScreenGrab(QWidget):
@@ -151,10 +156,11 @@ class GreyScreenGrab(QWidget):
         self.setWindowTitle("Greyscale")
         # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
         # If we use the same filename it gets replaced upon screenshot
+        screenshot_path = app_path("tempscreenshots", "screenshot.png")
         self.gscale = ImageOps.grayscale(ImageGrab.grab())
-        self.gscale.save("tempscreenshots/screenshot.png")
-        self.pixmap = QPixmap("tempscreenshots/screenshot.png")
-        self.setWindowIcon(QIcon("greyicon.svg"))
+        self.gscale.save(screenshot_path)
+        self.pixmap = QPixmap(screenshot_path)
+        self.setWindowIcon(QIcon(app_path("greyicon.svg")))
         self.label.setPixmap(self.pixmap)
         self.label.resize(self.width(), self.height())
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -191,18 +197,14 @@ class Tuffimage(QWidget):
         # we play a random sound from the phonk directory
         global phonk
         name = random.choice(phonk)
-        path = "phonk/"
-        choices = (path, name)
-        choice = "".join(choices)
+        choice = app_path("phonk", name)
         self.sound_process = subprocess.Popen(["mpg123", choice])
         screen = QApplication.primaryScreen().geometry()
         self.setGeometry(screen)
         self.label = QLabel(self)
         global icons
         name = random.choice(icons)
-        path = "icons/"
-        choices = (path, name)
-        choice = "".join(choices)
+        choice = app_path("icons", name)
         self.pixmap = QPixmap(choice)
         self.setWindowIcon(QIcon(choice))
         self.label.setPixmap(self.pixmap)
