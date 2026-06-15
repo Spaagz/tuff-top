@@ -10,9 +10,12 @@
 
 # Make your desktop TUFF
 
-![Montage of fall guys getting interrupted by crappy phonk edits](https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExbnR3ejhyeXZneWgwdm1iMDc0cHQweDg2MXUzd29oZTAxczUyNjh2ZCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/Beb7RLB8RDYnPLBgGb/giphy.gif)
+![Montage of fall guys getting interrupted by crappy phonk edits](https://giphy.com/embed/Beb7RLB8RDYnPLBgGb)
 
-This is a project with the intention to mimic those crappy phonk edits with over the top icons and greyscaling of the screen built for Linux wayland.
+This is a project with the intention to mimic those low quality phonk gameplay edits where the screen is frozen, grayscaled, accompanied with some stupid catchphrase and a bouncing "tuff" icon.
+In other words, it gives you the classic youtube shorts experience (from 3 years ago)
+
+Built for Linux wayland.
 The goal is to be able to use it in any game or app without having to make explicit support for it.
 
 ## Based of off generational game modifications such as:
@@ -32,3 +35,11 @@ The goal is to be able to use it in any game or app without having to make expli
 - Pillow
 
 Only tested on kde plasma
+
+**Music Credits:**
+- DVRST - Close Eyes
+- g3ox_em - GigaChad Theme (Phonk House Version) sped up
+- Kordhell - Live Another Day
+- INTERWORLD - METAMORPHOSIS
+- MoonDeity - NEON BLADE
+- Hensonn - Sahara
