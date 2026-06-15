@@ -10,7 +10,9 @@
 
 # Make your desktop TUFF
 
-![Montage of fall guys getting interrupted by phonk edits](https://github.com/Spaagz/tuff-top/blob/master/example-gifs/gameinterruptionpreview.gif?raw=true)
+<p align="center">
+  <img src="https://github.com/Spaagz/tuff-top/blob/master/example-gifs/gameinterruptionpreview.gif?raw=true" alt="Fall guys getting interrupted by a phonk edit"/>
+</p>
 
 This is a project with the intention to mimic those low quality phonk gameplay edits where the screen is frozen, grayscaled, accompanied with some stupid catchphrase and a bouncing "tuff" icon.
 In other words, it gives you the classic youtube shorts experience (from 3 years ago)
