@@ -32,3 +32,11 @@ The goal is to be able to use it in any game or app without having to make expli
 - Pillow
 
 Only tested on kde plasma
+
+**Music Credits:**
+- DVRST - Close Eyes
+- g3ox_em - GigaChad Theme (Phonk House Version) sped up
+- Kordhell - Live Another Day
+- INTERWORLD - METAMORPHOSIS
+- MoonDeity - NEON BLADE
+- Hensonn - Sahara
