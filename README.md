@@ -9,6 +9,7 @@
                                                      |_|
 
 # Make your desktop TUFF 🔥
+-> [Promotional Preview Video](https://www.youtube.com/watch?v=HbPldsK_V3k) <-
 
 <p align="center">
   <img src="https://github.com/Spaagz/tuff-top/blob/master/example-gifs/gameinterruptionpreview.gif?raw=true" alt="Fall guys getting interrupted by a phonk edit"/>
