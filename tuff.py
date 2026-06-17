@@ -24,7 +24,7 @@ def app_path(*parts):
 
 os.makedirs(app_path("tempscreenshots"), exist_ok=True)
 
-# Delete previous screenshot if it exists, thi only happens when the program shuts down incorrectly
+# Delete previous screenshot if it exists, this only happens when the program shuts down incorrectly
 if os.path.isfile(app_path("tempscreenshots", "screenshot.png")):
     os.remove(app_path("tempscreenshots", "screenshot.png"))
 
@@ -92,6 +92,7 @@ def onend(self):
 def aspectscale(newsize,self):
     self.scalefactor = self.pixmap.width()/self.pixmap.height()
     self.label.setPixmap(self.pixmap.scaled(int(round(newsize*self.scalefactor)), newsize))
+
 
 class Blackbar(QWidget):
     def __init__(self):
@@ -231,6 +232,8 @@ for device in devices:
         print(f"Found mouse: {device.name} at", mousepath)
 
 mouse = InputDevice(mousepath)
+# Play startup sound when after we have assigned everything
+startupsound = subprocess.Popen(["mpg123", app_path("startup.mp3")])
 
 async def input(dev):
     async for event in dev.async_read_loop():
