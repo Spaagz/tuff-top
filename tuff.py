@@ -4,13 +4,13 @@ import random
 import sys
 import os
 import time
+import base64
 from evdev import InputDevice, categorize, ecodes
 from PIL import ImageGrab, ImageOps
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QGraphicsDropShadowEffect
 from PyQt6.QtCore import Qt, QTimer, QUrl, QSocketNotifier
 from PyQt6.QtGui import QIcon, QPixmap, QFont, QFontDatabase, QColor, QGuiApplication
 from PyQt6.QtMultimedia import QMediaPlayer, QSoundEffect
-
 
 # get path relative to script
 def get_app_dir():
@@ -38,6 +38,9 @@ lines = config.readlines()
 
 phrasestext = open(app_path("phrases.txt"),"r")
 phrases = phrasestext.readlines()
+
+channelnamestext = open(app_path("channels.txt"),"r")
+channels = channelnamestext.readlines()
 
 # Apply config to vars
 # I absolutely love that this line here just works
@@ -72,22 +75,35 @@ def out_elastic(time_step: float) -> float:
         else math.pow(2, -10 * time_step) * math.sin((time_step * 10 - 0.75) * ANGLE) + 1
 
 
-
 # This scales a pixmap without stretching it
 def aspectscale(newsize,self):
     self.scalefactor = self.pixmap.width()/self.pixmap.height()
     self.icon.setPixmap(self.pixmap.scaled(int(round(newsize*self.scalefactor)), newsize))
 
+# I cant think of a better name for this function, but it randomly adds K or M to a string
+def numberifystring(string):
+    if random.randint(1,3) == 1:
+        p = "K"
+    elif random.randint(1,2) == 1:
+        p = "M"
+    else:
+        p = ""
+    l = [str(string),p]
+    out = "".join(l)
+    return(out)
+
 def mainloop():
     #Start the application only once for better performance and because all of the pyqt examples had it setup this way
     app = QApplication(sys.argv)
     class Tuff(QWidget):
+
         # This animates the window
         def inanim(self):
             if self.animstep == 0:
                 #Set as fullscreen application so it can display over a fullscreen app
                 self.showFullScreen()
                 screen = QApplication.primaryScreen().geometry()
+                dividedwidth = int(round(screen.width()/3))
                 #rerandomize on first tick of the animation
 
                 name = random.choice(icons)
@@ -127,6 +143,42 @@ def mainloop():
                     shadow.setColor(QColor('#222222'))
                     self.text.setGraphicsEffect(shadow)
                     self.show()
+                if showoverlay == 1:
+                    # Read template svg, create a new one with template values replaced and then delete it
+                    template = open(app_path("template.svg"), "r")
+                    data = template.read()
+                    data = data.replace('LikeCNT', numberifystring(random.randint(1,100)))
+                    data = data.replace('CommentCNT', numberifystring(random.randint(1,40)))
+                    # progress bar is static because I really dont want to create and delete a new svg every animation tick, nor do I know how to
+                    tojoin = ['transform="matrix(',str(random.randint(0,100)/100),',0,0,1,0.01126176,0)"']
+                    replacement = "".join(tojoin)
+                    data = data.replace('transform="matrix(1.0053463,0,0,1,0.01126176,0)"', replacement)
+                    data = data.replace('channelname', random.choice(channels))
+                    # Modify both sides of the gradient to have a random colour. Thank you geeks4geeks
+                    color = random.randrange(0, 2**24)
+                    hexrand = hex(color)
+                    randcol = hexrand[2:]
+                    data = data.replace('994d00', randcol)
+                    color = random.randrange(0, 2**24)
+                    hexrand = hex(color)
+                    randcol = hexrand[2:]
+                    data = data.replace('0000bb', randcol)
+                    data = data.replace('0.1232', str(random.uniform(0,1)))
+                    data = data.replace('0.1212', str(random.uniform(1,2)))
+                    randico = random.choice(icons)
+                    ico = app_path("icons", randico)
+                    # Convert random icon into base64 so we can use it in the svg
+                    with open(ico, "rb") as image_file:
+                        b64 = base64.b64encode(image_file.read())
+                        data = data.replace('b64here', b64.decode('utf8'))
+
+                    template.close()
+                    overlay = open(app_path("overlay.svg"), "w")
+                    overlay.write(data)
+                    overlay.close()
+                    self.overlaypix = QPixmap(app_path("overlay.svg"))
+                    os.remove(app_path("overlay.svg"))
+                    self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
                 name = random.choice(phonk)
                 phonksound = app_path("phonk", name)
                 self.effect.setSource(QUrl.fromLocalFile(phonksound))
@@ -147,6 +199,8 @@ def mainloop():
                 self.effect.stop()
                 self.hide()
                 self.animation.stop()
+                if os.path.isfile(app_path("tempscreenshots", "screenshot.png")):
+                    os.remove(app_path("tempscreenshots", "screenshot.png"))
 
         # This is for creating the main window
         def __init__(self):
@@ -169,8 +223,6 @@ def mainloop():
             # Take a screenshot so we can turn the screen greyscale - this is done using PIL because pyqt doesn't support taking screenies on wayland
             # If we use the same filename it gets replaced upon screenshot
             screenshot_path = app_path("tempscreenshots", "screenshot.png")
-            self.gscale = ImageOps.grayscale(ImageGrab.grab())
-            self.gscale.save(screenshot_path)
             self.pixmap = QPixmap(screenshot_path)
             self.greyscreenshot.setPixmap(self.pixmap)
             self.greyscreenshot.resize(self.width(), self.height())
@@ -201,8 +253,6 @@ def mainloop():
             self.rightbar.setStyleSheet("background-color: black")
             if showoverlay == 1:
                 self.overlay = QLabel(self)
-                self.overlaypix = QPixmap(app_path("overlay.png"))
-                self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
                 self.overlay.resize(dividedwidth,screen.height())
                 self.overlay.move(dividedwidth,0)
             if showtext == 1:
