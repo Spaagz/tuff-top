@@ -47,6 +47,7 @@ scale = int(lines[16])
 bars = int(lines[18])
 showtext = int(lines[20])
 volume = float(float(lines[22])/100)
+showoverlay = int(lines[24])
 icons = []
 phonk = []
 fonts = []
@@ -132,7 +133,7 @@ def mainloop():
                 self.effect.play()
 
             self.animstep += 1
-            # We use modulus it to make it bounce to the beat, it's not audio reactive but if you mute your speakers it kinda looks like it
+            # We use modulus to make it bounce to the beat, it's not audio reactive but if you mute your speakers it kinda looks like it
             if self.animstep % 12 == 0:
                 self.animscale = 0
             else:
@@ -198,10 +199,15 @@ def mainloop():
             self.rightbar.move(dividedwidth*2,0)
             self.leftbar.setStyleSheet("background-color: black")
             self.rightbar.setStyleSheet("background-color: black")
+            if showoverlay == 1:
+                self.overlay = QLabel(self)
+                self.overlaypix = QPixmap(app_path("overlay.png"))
+                self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
+                self.overlay.resize(dividedwidth,screen.height())
+                self.overlay.move(dividedwidth,0)
             if showtext == 1:
                 name = random.choice(fonts)
                 choice = app_path("fonts", name)
-
                 id = QFontDatabase.addApplicationFont(choice)
                 if id < 0:
                     print("No font file found. Check capitalisation and that it exists as a child of the script")

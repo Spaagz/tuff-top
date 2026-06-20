@@ -21,3 +21,5 @@ Put tuff images in the icons folder
 1
     Volume (%, but can go over 100)
 40
+    Show overlay (0=no, 1=yes)
+0
