@@ -15,6 +15,11 @@
   <img src="https://github.com/Spaagz/tuff-top/blob/master/example-gifs/gameinterruptionpreview.gif?raw=true" alt="Fall guys getting interrupted by a phonk edit"/>
 </p>
 
+If the app crashes on launch, try adding your user to the input group and logging out and back in:
+```
+sudo usermod -aG input $USER
+```
+
 This is a project with the intention to mimic those low quality phonk gameplay edits where the screen is frozen, grayscaled, accompanied with some stupid catchphrase and a bouncing "tuff" icon.
 In other words, it gives you the classic youtube shorts experience (from 3 years ago)
 
