@@ -6,11 +6,11 @@
                         |_|\__,_|_| |_|      |_|\___/| .__/
 Add generic reactions to phrases.txt                 | |
 Put fonts in the fonts folder                        |_|
-Put phonk music in the phonk folder
+Put phonk music in the phonk folder (.wav only)
 Put tuff images in the icons folder
                               ~ Config ~
     % Chance of interruption  (every click, can support one decimal place)
-5
+10
     Seconds the phonk plays for
 3
     Scale of the icon
@@ -19,3 +19,5 @@ Put tuff images in the icons folder
 1
     Text (0=no, 1=yes)
 1
+    Volume (%, but can go over 100)
+40
