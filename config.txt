@@ -10,7 +10,7 @@ Put phonk music in the phonk folder (.wav only)
 Put tuff images in the icons folder
                               ~ Config ~
     % Chance of interruption  (every click, can support one decimal place)
-20
+10
     Seconds the phonk plays for
 3
     Scale of the icon
