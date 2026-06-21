@@ -10,7 +10,7 @@ Put phonk music in the phonk folder (.wav only)
 Put tuff images in the icons folder
                               ~ Config ~
     % Chance of interruption  (every click, can support one decimal place)
-10
+50
     Seconds the phonk plays for
 3
     Scale of the icon
@@ -20,6 +20,6 @@ Put tuff images in the icons folder
     Text (0=no, 1=yes)
 1
     Volume (%, but can go over 100)
-40
+20
     Show overlay (0=no, 1=yes)
 1

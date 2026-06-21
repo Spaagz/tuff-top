@@ -42,7 +42,8 @@ You will have to close the python process from a task manager when done
 > https://geode-sdk.org/mods/saritahhh.youtubeshortsedit
 
 🧰 **Features:**
-- Customisable icons and music
+- Customisable icons music and fonts
+- Youtube shorts overlay
 - Robust config with chance of tuffness and stay time
 - Click detection as a trigger
 - Greyscaling of the screen for maximum tuffness
@@ -55,3 +56,5 @@ You will have to close the python process from a task manager when done
 - INTERWORLD - METAMORPHOSIS
 - MoonDeity - NEON BLADE
 - Hensonn - Sahara
+- sma$her & MXZI - Acelerada
+- 6ynthmane, RXDXVIL - BRAZILIAN DANCA PHONK
