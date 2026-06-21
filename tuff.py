@@ -48,9 +48,9 @@ chance = int(float(lines[12])*10)
 staytime = int(lines[14])
 scale = int(lines[16])
 bars = int(lines[18])
-showtext = int(lines[20])
+showtext = float(lines[20])
 volume = float(float(lines[22])/100)
-showoverlay = int(lines[24])
+showoverlay = float(lines[24])
 icons = []
 phonk = []
 fonts = []
@@ -123,62 +123,67 @@ def mainloop():
                 self.gscale.save(screenshot_path)
                 self.gscreen = QPixmap(screenshot_path)
                 self.greyscreenshot.setPixmap(self.gscreen)
-                if showtext == 1:
-                    name = random.choice(fonts)
-                    choice = app_path("fonts", name)
+                if showtext > 0:
+                    if float(random.randint(1,100))/100 <= showtext:
+                        self.text.show()
+                        name = random.choice(fonts)
+                        choice = app_path("fonts", name)
 
-                    id = QFontDatabase.addApplicationFont(choice)
-                    families = QFontDatabase.applicationFontFamilies(id)
-                    self.text.setText(random.choice(phrases))
-                    self.text.setFont(QFont(families[0], 44))
-                    #self.text.setFont(QFont('Times', 44))
-                    #self.text.setAlignment(QtCore.Qt.AlignCenter)
-                    self.text.resize(int(round(screen.width()/3)), screen.height())
-                    self.text.setWordWrap(True)
-                    self.text.setAlignment(Qt.AlignmentFlag.AlignCenter)
-                    self.text.move(int(round(screen.width()/3)), int(round(screen.height()/-3)))
-                    # apply shadow to text
-                    shadow = QGraphicsDropShadowEffect()
-                    shadow.setBlurRadius(50)
-                    shadow.setColor(QColor('#222222'))
-                    self.text.setGraphicsEffect(shadow)
-                    self.show()
-                if showoverlay == 1:
-                    # Read template svg, create a new one with template values replaced and then delete it
-                    template = open(app_path("template.svg"), "r")
-                    data = template.read()
-                    data = data.replace('LikeCNT', numberifystring(random.randint(1,100)))
-                    data = data.replace('CommentCNT', numberifystring(random.randint(1,40)))
-                    # progress bar is static because I really dont want to create and delete a new svg every animation tick, nor do I know how to
-                    tojoin = ['transform="matrix(',str(random.randint(0,100)/100),',0,0,1,0.01126176,0)"']
-                    replacement = "".join(tojoin)
-                    data = data.replace('transform="matrix(1.0053463,0,0,1,0.01126176,0)"', replacement)
-                    data = data.replace('channelname', random.choice(channels))
-                    # Modify both sides of the gradient to have a random colour. Thank you geeks4geeks
-                    color = random.randrange(0, 2**24)
-                    hexrand = hex(color)
-                    randcol = hexrand[2:]
-                    data = data.replace('994d00', randcol)
-                    color = random.randrange(0, 2**24)
-                    hexrand = hex(color)
-                    randcol = hexrand[2:]
-                    data = data.replace('0000bb', randcol)
-                    data = data.replace('0.1232', str(random.uniform(0,1)))
-                    data = data.replace('0.1212', str(random.uniform(1,2)))
-                    randico = random.choice(icons)
-                    ico = app_path("icons", randico)
-                    # Convert random icon into base64 so we can use it in the svg
-                    with open(ico, "rb") as image_file:
-                        b64 = base64.b64encode(image_file.read())
-                        data = data.replace('b64here', b64.decode('utf8'))
+                        id = QFontDatabase.addApplicationFont(choice)
+                        families = QFontDatabase.applicationFontFamilies(id)
+                        self.text.setText(random.choice(phrases))
+                        self.text.setFont(QFont(families[0], 44))
+                        self.text.resize(int(round(screen.width()/3)), screen.height())
+                        self.text.setWordWrap(True)
+                        self.text.setAlignment(Qt.AlignmentFlag.AlignCenter)
+                        self.text.move(int(round(screen.width()/3)), int(round(screen.height()/-3)))
+                        # apply shadow to text
+                        shadow = QGraphicsDropShadowEffect()
+                        shadow.setBlurRadius(50)
+                        shadow.setColor(QColor('#222222'))
+                        self.text.setGraphicsEffect(shadow)
+                    else:
+                        self.text.hide()
+                if showoverlay > 0:
+                    if float(random.randint(1,100))/100 <= showoverlay:
+                        self.overlay.show()
+                        # Read template svg, create a new one with template values replaced and then delete it
+                        template = open(app_path("template.svg"), "r")
+                        data = template.read()
+                        data = data.replace('LikeCNT', numberifystring(random.randint(1,100)))
+                        data = data.replace('CommentCNT', numberifystring(random.randint(1,40)))
+                        # progress bar is static because I really dont want to create and delete a new svg every animation tick, nor do I know how to
+                        tojoin = ['transform="matrix(',str(random.randint(0,100)/100),',0,0,1,0.01126176,0)"']
+                        replacement = "".join(tojoin)
+                        data = data.replace('transform="matrix(1.0053463,0,0,1,0.01126176,0)"', replacement)
+                        data = data.replace('channelname', random.choice(channels))
+                        # Modify both sides of the gradient to have a random colour. Thank you geeks4geeks
+                        color = random.randrange(0, 2**24)
+                        hexrand = hex(color)
+                        randcol = hexrand[2:]
+                        data = data.replace('994d00', randcol)
+                        color = random.randrange(0, 2**24)
+                        hexrand = hex(color)
+                        randcol = hexrand[2:]
+                        data = data.replace('0000bb', randcol)
+                        data = data.replace('0.1232', str(random.uniform(0,1)))
+                        data = data.replace('0.1212', str(random.uniform(1,2)))
+                        randico = random.choice(icons)
+                        ico = app_path("icons", randico)
+                        # Convert random icon into base64 so we can use it in the svg
+                        with open(ico, "rb") as image_file:
+                            b64 = base64.b64encode(image_file.read())
+                            data = data.replace('b64here', b64.decode('utf8'))
 
-                    template.close()
-                    overlay = open(app_path("overlay.svg"), "w")
-                    overlay.write(data)
-                    overlay.close()
-                    self.overlaypix = QPixmap(app_path("overlay.svg"))
-                    os.remove(app_path("overlay.svg"))
-                    self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
+                        template.close()
+                        overlay = open(app_path("overlay.svg"), "w")
+                        overlay.write(data)
+                        overlay.close()
+                        self.overlaypix = QPixmap(app_path("overlay.svg"))
+                        os.remove(app_path("overlay.svg"))
+                        self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
+                    else:
+                        self.overlay.hide()
                 name = random.choice(phonk)
                 phonksound = app_path("phonk", name)
                 self.effect.setSource(QUrl.fromLocalFile(phonksound))
@@ -244,18 +249,19 @@ def mainloop():
             # SETUP BLACK BARS AND TEXT
             dividedwidth = int(round(screen.width()/3))
             self.setGeometry(0, 0, screen.width(), screen.height())
-            self.leftbar = QLabel(self)
-            self.rightbar = QLabel(self)
-            self.leftbar.resize(dividedwidth,screen.height())
-            self.rightbar.resize(dividedwidth,screen.height())
-            self.rightbar.move(dividedwidth*2,0)
-            self.leftbar.setStyleSheet("background-color: black")
-            self.rightbar.setStyleSheet("background-color: black")
-            if showoverlay == 1:
+            if bars == 1:
+                self.leftbar = QLabel(self)
+                self.rightbar = QLabel(self)
+                self.leftbar.resize(dividedwidth,screen.height())
+                self.rightbar.resize(dividedwidth,screen.height())
+                self.rightbar.move(dividedwidth*2,0)
+                self.leftbar.setStyleSheet("background-color: black")
+                self.rightbar.setStyleSheet("background-color: black")
+            if showoverlay > 0:
                 self.overlay = QLabel(self)
                 self.overlay.resize(dividedwidth,screen.height())
                 self.overlay.move(dividedwidth,0)
-            if showtext == 1:
+            if showtext > 0:
                 name = random.choice(fonts)
                 choice = app_path("fonts", name)
                 id = QFontDatabase.addApplicationFont(choice)
