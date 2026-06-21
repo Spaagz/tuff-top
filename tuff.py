@@ -150,8 +150,11 @@ def mainloop():
                         # Read template svg, create a new one with template values replaced and then delete it
                         template = open(app_path("template.svg"), "r")
                         data = template.read()
-                        data = data.replace('LikeCNT', numberifystring(random.randint(1,100)))
-                        data = data.replace('CommentCNT', numberifystring(random.randint(1,40)))
+
+                        for i in range(len(data)):
+                            if data.startswith("CNT", i):
+                                data = data[:i] + numberifystring(random.randint(1,100)) + data[i+3:]
+
                         # progress bar is static because I really dont want to create and delete a new svg every animation tick, nor do I know how to
                         tojoin = ['transform="matrix(',str(random.randint(0,100)/100),',0,0,1,0.01126176,0)"']
                         replacement = "".join(tojoin)
