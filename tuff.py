@@ -54,6 +54,7 @@ showoverlay = float(lines[24])
 icons = []
 phonk = []
 fonts = []
+overlays = []
 
 icondir = os.listdir(app_path("icons"))
 for file in icondir:
@@ -66,6 +67,10 @@ for file in phonkdir:
 fontdir = os.listdir(app_path("fonts"))
 for file in fontdir:
     fonts.append(file)
+
+overlaydir = os.listdir(app_path("overlays"))
+for file in overlaydir:
+    overlays.append(file)
 
 TAU = math.tau
 
@@ -148,7 +153,7 @@ def mainloop():
                     if float(random.randint(1,100))/100 <= showoverlay:
                         self.overlay.show()
                         # Read template svg, create a new one with template values replaced and then delete it
-                        template = open(app_path("template.svg"), "r")
+                        template = open(app_path("overlays", random.choice(overlays)), "r")
                         data = template.read()
 
                         for i in range(len(data)):
