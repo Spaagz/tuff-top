@@ -15,11 +15,15 @@ Put tuff images in the icons folder
 3
     Scale of the icon
 250
-    Black bars (0=no, 1=yes)
+    Black bars (0 = no, 1 = yes)
 1
-    Text (1= always, 0.5= 50%, 0 = never)
+    Text (1 = always, 0.5 = 50%, 0 = never)
 0.8
     Volume (%, but can go over 100)
 20
-    Show overlay (1= always, 0.5= 50%, 0 = never)
+    Show overlay (1 = always, 0.5 = 50%, 0 = never)
+1
+    Bounce icon intensity
+10
+    Background bounce (1 = yes, 0 = no)
 1

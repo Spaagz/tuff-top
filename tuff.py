@@ -51,6 +51,8 @@ bars = int(lines[18])
 showtext = float(lines[20])
 volume = float(float(lines[22])/100)
 showoverlay = float(lines[24])
+bounceintensity = int(lines[26])
+bgbounce = int(lines[28])
 icons = []
 phonk = []
 fonts = []
@@ -81,9 +83,9 @@ def out_elastic(time_step: float) -> float:
 
 
 # This scales a pixmap without stretching it
-def aspectscale(newsize,self):
-    self.scalefactor = self.pixmap.width()/self.pixmap.height()
-    self.icon.setPixmap(self.pixmap.scaled(int(round(newsize*self.scalefactor)), newsize))
+def aspectscale(newsize,me):
+    me.scalefactor = me.pixmap.width()/me.pixmap.height()
+    me.icon.setPixmap(me.pixmap.scaled(int(round(newsize*me.scalefactor)), newsize))
 
 # I cant think of a better name for this function, but it randomly adds K or M to a string
 def numberifystring(string):
@@ -203,7 +205,11 @@ def mainloop():
                 self.animscale = 0
             else:
                 self.animscale += 1
-            aspectscale(scale + round(out_elastic(self.animscale /40) * 20), self)
+            aspectscale(scale + round(out_elastic(self.animscale /40) * bounceintensity), self)
+            if bgbounce == 1:
+                newsize = self.gscreen.height() + round(out_elastic(self.animscale /40) * bounceintensity)
+                self.greyscreenshot.scalefactor = self.gscreen.width()/self.gscreen.height()
+                self.greyscreenshot.setPixmap(self.gscreen.scaled(int(round(newsize*self.greyscreenshot.scalefactor)), newsize))
             # The position is hardcoded, this is not a to do but if you are bored then make it customizable
             self.posx = -200 + round(out_elastic(self.animstep / 10)*200)
             self.posy = 100 + round(out_elastic(self.animstep / 10)*200)
