@@ -4,6 +4,7 @@ import random
 import sys
 import os
 import time
+import platform
 import base64
 from evdev import InputDevice, categorize, ecodes
 from PIL import ImageGrab, ImageOps
@@ -11,6 +12,12 @@ from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QGraphicsDropShadowEf
 from PyQt6.QtCore import Qt, QTimer, QUrl, QSocketNotifier
 from PyQt6.QtGui import QIcon, QPixmap, QFont, QFontDatabase, QColor, QGuiApplication
 from PyQt6.QtMultimedia import QMediaPlayer, QSoundEffect
+
+operatingsystem = platform.system()
+# TODO: ACTUALLY MAKE WINDOWS PYNPUT WORK
+if operatingsystem == "Windows":
+    from pynput import mouse
+    print("Windows detected")
 
 # get path relative to script
 def get_app_dir():
@@ -323,14 +330,15 @@ def mainloop():
     tuff = Tuff()
     sys.exit(app.exec())
 
-# This should find the mouse. If you have multiple mice... Well...
-devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
-for device in devices:
-    if 272 in device.capabilities().get(ecodes.EV_KEY, []):
-        mousepath = device.path
-        print(f"Found mouse: {device.name} at", mousepath)
+if operatingsystem == "Linux":
+    # This should find the mouse. If you have multiple mice... Well...
+    devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
+    for device in devices:
+        if 272 in device.capabilities().get(ecodes.EV_KEY, []):
+            mousepath = device.path
+            print(f"Found mouse: {device.name} at", mousepath)
 
-mouse = InputDevice(mousepath)
+    mouse = InputDevice(mousepath)
 
 if __name__ == "__main__":
     # Start the main loop, now evdev and windows are handled in this
