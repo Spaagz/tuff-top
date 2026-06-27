@@ -1,5 +1,4 @@
 import math
-import evdev
 import random
 import sys
 import os
@@ -13,11 +12,19 @@ from PyQt6.QtCore import Qt, QTimer, QUrl, QSocketNotifier
 from PyQt6.QtGui import QIcon, QPixmap, QFont, QFontDatabase, QColor, QGuiApplication
 from PyQt6.QtMultimedia import QMediaPlayer, QSoundEffect
 
+linux = True
 operatingsystem = platform.system()
-# TODO: ACTUALLY MAKE WINDOWS PYNPUT WORK
+# TODO: TEST PYNPUT BEFORE BUILDING
 if operatingsystem == "Windows":
     from pynput import mouse
-    print("Windows detected")
+    print("Using pynput on Windows")
+    linux = False
+elif operatingsystem == "Linux":
+    import evdev
+    linux = True
+    print("Using evdev on Linux")
+else:
+    print("System ",operatingsystem," is unsupported, defaulting to evdev")
 
 # get path relative to script
 def get_app_dir():
@@ -94,11 +101,11 @@ def aspectscale(newsize,me):
     me.scalefactor = me.pixmap.width()/me.pixmap.height()
     me.icon.setPixmap(me.pixmap.scaled(int(round(newsize*me.scalefactor)), newsize))
 
-# I cant think of a better name for this function, but it randomly adds K or M to a string
+# This randomly appends K or M to a string
 def numberifystring(string):
     if random.randint(1,3) == 1:
         p = "K"
-    elif random.randint(1,2) == 1:
+    elif random.randint(1,3) == 1:
         p = "M"
     else:
         p = ""
@@ -309,10 +316,16 @@ def mainloop():
             self.effect.play()
             self.animation = QTimer(self)
             self.animation.timeout.connect(self.inanim)
-            self.mouse = InputDevice(mousepath)
-            # We setup a notifier for mouse clicks
-            self.notifier = QSocketNotifier(self.mouse.fd, QSocketNotifier.Type.Read, self)
-            self.notifier.activated.connect(self.on_mouse_event)
+            if linux:
+                self.mouse = InputDevice(mousepath)
+                # We setup a notifier for mouse clicks
+                self.notifier = QSocketNotifier(self.mouse.fd, QSocketNotifier.Type.Read, self)
+                self.notifier.activated.connect(self.on_mouse_event)
+            else:
+                # WIP pynput testing
+                listener = mouse.Listener(
+                    on_click=self.trigger_anim())
+                listener.start()
 
 
         def on_mouse_event(self):
@@ -330,7 +343,7 @@ def mainloop():
     tuff = Tuff()
     sys.exit(app.exec())
 
-if operatingsystem == "Linux":
+if linux:
     # This should find the mouse. If you have multiple mice... Well...
     devices = [evdev.InputDevice(path) for path in evdev.list_devices()]
     for device in devices:
