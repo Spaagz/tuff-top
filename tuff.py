@@ -5,25 +5,24 @@ import os
 import time
 import platform
 import base64
-from evdev import InputDevice, categorize, ecodes
 from PIL import ImageGrab, ImageOps
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QGraphicsDropShadowEffect
-from PyQt6.QtCore import Qt, QTimer, QUrl, QSocketNotifier
+from PyQt6.QtCore import Qt, QTimer, QUrl, QSocketNotifier, pyqtSignal
 from PyQt6.QtGui import QIcon, QPixmap, QFont, QFontDatabase, QColor, QGuiApplication
 from PyQt6.QtMultimedia import QMediaPlayer, QSoundEffect
 
-linux = True
 operatingsystem = platform.system()
-# TODO: TEST PYNPUT BEFORE BUILDING
 if operatingsystem == "Windows":
     from pynput import mouse
     print("Using pynput on Windows")
     linux = False
 elif operatingsystem == "Linux":
     import evdev
+    from evdev import InputDevice, categorize, ecodes
     linux = True
     print("Using evdev on Linux")
 else:
+    linux = True
     print("System ",operatingsystem," is unsupported, defaulting to evdev")
 
 # get path relative to script
@@ -46,14 +45,14 @@ if os.path.isfile(app_path("tempscreenshots", "screenshot.png")):
 # Read config before startup with error handling because im so cool
 if not os.path.isfile(app_path("config.txt")):
     sys.exit("No config found, aborting. Check it exists")
-
-config = open(app_path("config.txt"), "r")
+# Utf 8 has to be specified on windows or else some weird encoding errors start bombarding you
+config = open(app_path("config.txt"), encoding = "UTF-8")
 lines = config.readlines()
 
-phrasestext = open(app_path("phrases.txt"),"r")
+phrasestext = open(app_path("phrases.txt"), encoding = "UTF-8")
 phrases = phrasestext.readlines()
 
-channelnamestext = open(app_path("channels.txt"),"r")
+channelnamestext = open(app_path("channels.txt"), encoding = "UTF-8")
 channels = channelnamestext.readlines()
 
 # Apply config to vars
@@ -117,12 +116,12 @@ def mainloop():
     #Start the application only once for better performance and because all of the pyqt examples had it setup this way
     app = QApplication(sys.argv)
     class Tuff(QWidget):
-
+        # This is a way to get back to the pyqt thread
+        mouseClicked = pyqtSignal()
         # This animates the window
         def inanim(self):
             if self.animstep == 0:
                 #Set as fullscreen application so it can display over a fullscreen app
-                self.showFullScreen()
                 screen = QApplication.primaryScreen().geometry()
                 dividedwidth = int(round(screen.width()/3))
                 #rerandomize on first tick of the animation
@@ -208,6 +207,7 @@ def mainloop():
                         self.overlay.setPixmap(self.overlaypix.scaled(dividedwidth,screen.height()))
                     else:
                         self.overlay.hide()
+                self.showFullScreen()
                 name = random.choice(phonk)
                 phonksound = app_path("phonk", name)
                 self.effect.setSource(QUrl.fromLocalFile(phonksound))
@@ -243,7 +243,6 @@ def mainloop():
             self.setWindowFlags(
                 Qt.WindowType.FramelessWindowHint
                 | Qt.WindowType.WindowStaysOnTopHint
-                | Qt.WindowType.Tool
             )
             self.setWindowTitle("Tuff")
             self.setAttribute(Qt.WidgetAttribute.WA_TranslucentBackground)
@@ -304,29 +303,29 @@ def mainloop():
                     self.text.setWordWrap(True)
                     self.text.setAlignment(Qt.AlignmentFlag.AlignCenter)
                     self.text.move(int(round(screen.width()/3)), int(round(screen.height()/-3)))
+                    self.text.setStyleSheet("color : white;")
                     # apply shadow to text
                     shadow = QGraphicsDropShadowEffect()
                     shadow.setBlurRadius(50)
                     shadow.setColor(QColor('#222222'))
                     self.text.setGraphicsEffect(shadow)
-            # Create qsoundeffect and play a test startup sound
+            self.animation = QTimer(self)
+            self.animation.timeout.connect(self.inanim)
+
+            # Trigger_anim always runs on pyqt thread
+            self.mouseClicked.connect(self.trigger_anim)
             self.effect = QSoundEffect()
+            # Create qsoundeffect and play a test startup sound
             self.effect.setVolume(volume)
             self.effect.setSource(QUrl.fromLocalFile(app_path("startup.wav")))
             self.effect.play()
-            self.animation = QTimer(self)
-            self.animation.timeout.connect(self.inanim)
             if linux:
                 self.mouse = InputDevice(mousepath)
                 # We setup a notifier for mouse clicks
                 self.notifier = QSocketNotifier(self.mouse.fd, QSocketNotifier.Type.Read, self)
                 self.notifier.activated.connect(self.on_mouse_event)
             else:
-                # WIP pynput testing
-                listener = mouse.Listener(
-                    on_click=self.trigger_anim())
-                listener.start()
-
+                self.windows_listener()
 
         def on_mouse_event(self):
             for event in self.mouse.read():
@@ -334,7 +333,15 @@ def mainloop():
                     key_event = categorize(event)
                     if key_event.keystate == key_event.key_up:
                         self.trigger_anim()
-            # TRIGGER ANIMATION
+
+        def windows_listener(self):
+            def on_click(x, y, button, pressed):
+                if button == mouse.Button.left and not pressed:
+                    self.mouseClicked.emit()
+
+            self.listener = mouse.Listener(on_click=on_click)
+            self.listener.start()  # non-blocking, runs in background thread
+
         def trigger_anim(self):
             if not self.animation.isActive() and random.randint(0,1000) <= chance:
                 self.animstep = 0
