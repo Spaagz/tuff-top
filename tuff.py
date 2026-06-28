@@ -32,7 +32,6 @@ def get_app_dir():
     return os.path.dirname(os.path.abspath(__file__))
 
 APP_DIR = get_app_dir()
-
 def app_path(*parts):
     return os.path.join(APP_DIR, *parts)
 
