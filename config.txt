@@ -1,8 +1,8 @@
-                      _______     __  __   _______
+Welcome to            _______     __  __   _______
                      |__   __|   / _|/ _| |__   __|
                         | |_   _| |_| |_     | | ___  _ __
                         | | | | |  _|  _|    | |/ _ \| '_ \
-                        | | |_| | | | |      | | (_) | |_) |
+                        | | |_| | | | |      | | (_) | |_) | Everything but _internal can be changed freely, feel free to experiment!
                         |_|\__,_|_| |_|      |_|\___/| .__/
 Add generic reactions to phrases.txt                 | |    Put bogus channel names in channels.txt if you are using the overlay
 Put fonts in the fonts folder                        |_|
